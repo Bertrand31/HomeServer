@@ -1,0 +1,23 @@
+---
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - USER=bertrand
+      - PASS=foobar
+      - WHITELIST= #optional
+      - PEERPORT=1234
+      - HOST_WHITELIST= #optional
+    volumes:
+      - /home/bertrand/transmission-data:/config
+      - /home/bertrand/downloads:/downloads
+      # - /home/bertrand/torrents:/watch
+    ports:
+      - 9091:9091
+      - 1234:1234
+      - 1234:1234/udp
+    restart: unless-stopped

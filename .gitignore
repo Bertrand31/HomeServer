@@ -1,2 +1,11 @@
+# Immich
 **/.env
+
+# OpenVPN
 openvpn/etc
+
+# Beszel
+beszel/beszel_data/*
+beszel/beszel_socket/*
+# Beszel agent
+beszel/beszel_agent_data/*

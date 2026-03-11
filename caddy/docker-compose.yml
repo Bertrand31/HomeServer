@@ -1,0 +1,19 @@
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+    volumes:
+      - $PWD/conf:/etc/caddy
+      - $PWD/site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+volumes:
+  caddy_data:
+  caddy_config:

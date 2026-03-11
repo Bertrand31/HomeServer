@@ -1,0 +1,24 @@
+services:
+  transmission-openvpn:
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - '/home/bertrand/downloads/:/data'
+      - '/home/bertrand/transmission-data/:/config'
+    environment:
+      - OPENVPN_PROVIDER=NORDVPN
+      - OPENVPN_USERNAME=${NORDVPN_USERNAME}
+      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
+      - NORDVPN_COUNTRY=NL
+      - NORDVPN_CATEGORY=p2p
+      - NORDVPN_PROTOCOL=tcp
+      - LOCAL_NETWORK=192.168.0.0/16
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - '9092:9091'
+    image: haugene/transmission-openvpn
+    env_file:
+      - .env

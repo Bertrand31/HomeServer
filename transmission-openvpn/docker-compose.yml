@@ -13,6 +13,10 @@ services:
       - NORDVPN_CATEGORY=p2p
       - NORDVPN_PROTOCOL=tcp
       - LOCAL_NETWORK=192.168.0.0/16
+      # Fix random crashes
+      # https://github.com/haugene/docker-transmission-openvpn/discussions/2064#discussioncomment-3021938
+      - CONFIG_MOD_PING=0
+      - OPENVPN_OPTS=--ping 10 --pull-filter ignore ping
     logging:
       driver: json-file
       options:

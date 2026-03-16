@@ -1,0 +1,109 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    user: 1000:988
+    group_add:
+      - '992' # Result of: getent group render | cut -d: -f3
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
+    volumes:
+      - /home/bertrand/jellyfin/config:/config
+      - /home/bertrand/jellyfin/cache:/cache
+      - type: bind
+        source: /home/bertrand/data/media
+        target: /media
+    restart: 'unless-stopped'
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/bertrand/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Etc/UTC
+      - PORT=5055 #optional
+    ports:
+      - 5055:5055
+    volumes:
+      - /home/bertrand/seer/config:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/bertrand/radarr/config:/config
+      - /home/bertrand/data/media/movies:/movies #optional
+      # - /home/bertrand/data:/data #optional
+      - /home/bertrand/data/torrents/completed/radarr:/data/completed/radarr
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/bertrand/sonarr/config:/config
+      - /home/bertrand/data/media/tv:/tv #optional
+      - /home/bertrand/downloads:/downloads #optional
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+  transmission-openvpn:
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /home/bertrand/data/torrents:/data
+      - /home/bertrand/transmission-openvpn:/config
+    environment:
+      - OPENVPN_PROVIDER=NORDVPN
+      - OPENVPN_USERNAME=${NORDVPN_USERNAME}
+      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
+      - NORDVPN_COUNTRY=NL
+      - NORDVPN_CATEGORY=p2p
+      - NORDVPN_PROTOCOL=tcp
+      - LOCAL_NETWORK=192.168.0.0/16
+      # Fix random crashes
+      # https://github.com/haugene/docker-transmission-openvpn/discussions/2064#discussioncomment-3021938
+      - CONFIG_MOD_PING=0
+      - OPENVPN_OPTS=--ping 10 --pull-filter ignore ping
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - '9092:9091'
+    image: haugene/transmission-openvpn
+    env_file:
+      - .env

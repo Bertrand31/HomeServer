@@ -76,7 +76,8 @@ services:
     volumes:
       - /home/bertrand/sonarr/config:/config
       - /home/bertrand/data/media/tv:/tv #optional
-      - /home/bertrand/downloads:/downloads #optional
+      # - /home/bertrand/downloads:/downloads #optional
+      - /home/bertrand/data/torrents/completed/sonarr:/data/completed/sonarr
     ports:
       - 8989:8989
     restart: unless-stopped

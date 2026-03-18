@@ -29,9 +29,17 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /home/bertrand/prowlarr:/config
-    ports:
-      - 9696:9696
+    # ports:
+    #   - 9696:9696
     restart: unless-stopped
+    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
+    depends_on:
+      - transmission-openvpn # Set dependency on transmission-openvpn Container
+    healthcheck: # Here we check if transmission is reachable from the Prowlarr container via localhost
+      test: curl -f http://localhost:9696 || exit 1
+      interval: 5m00s
+      timeout: 10s
+      retries: 2
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
@@ -104,7 +112,8 @@ services:
       options:
         max-size: 10m
     ports:
-      - '9092:9091'
+      - 9092:9091
+      - 9696:9696 # Prowlarr port
     image: haugene/transmission-openvpn
     env_file:
       - .env

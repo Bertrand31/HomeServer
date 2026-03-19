@@ -36,7 +36,7 @@ services:
     depends_on:
       - transmission-openvpn # Set dependency on transmission-openvpn Container
     healthcheck: # Here we check if transmission is reachable from the Prowlarr container via localhost
-      test: curl -f http://localhost:9696 || exit 1
+      test: curl -f http://localhost:9091 || exit 1
       interval: 5m00s
       timeout: 10s
       retries: 2
@@ -48,10 +48,13 @@ services:
       - LOG_LEVEL=debug
       - TZ=Etc/UTC
       - PORT=5055 #optional
-    ports:
-      - 5055:5055
+    # ports:
+    #   - 5055:5055
     volumes:
       - /home/bertrand/seer/config:/app/config
+    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
+    depends_on:
+      - transmission-openvpn # Set dependency on transmission-openvpn Container
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -71,9 +74,12 @@ services:
       - /home/bertrand/data/media/movies:/movies #optional
       # - /home/bertrand/data:/data #optional
       - /home/bertrand/data/torrents/completed/radarr:/data/completed/radarr
-    ports:
-      - 7878:7878
+    # ports:
+    #   - 7878:7878
     restart: unless-stopped
+    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
+    depends_on:
+      - transmission-openvpn # Set dependency on transmission-openvpn Container
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -86,9 +92,12 @@ services:
       - /home/bertrand/data/media/tv:/tv #optional
       # - /home/bertrand/downloads:/downloads #optional
       - /home/bertrand/data/torrents/completed/sonarr:/data/completed/sonarr
-    ports:
-      - 8989:8989
+    # ports:
+    #   - 8989:8989
     restart: unless-stopped
+    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
+    depends_on:
+      - transmission-openvpn # Set dependency on transmission-openvpn Container
   transmission-openvpn:
     cap_add:
       - NET_ADMIN
@@ -114,6 +123,9 @@ services:
     ports:
       - 9092:9091
       - 9696:9696 # Prowlarr port
+      - 5055:5055 # Seer
+      - 7878:7878 # Radarr
+      - 8989:8989 # Sonarr
     image: haugene/transmission-openvpn
     env_file:
       - .env

@@ -97,6 +97,25 @@ services:
     network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
     depends_on:
       - transmission-openvpn # Set dependency on transmission-openvpn Container
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    restart: unless-stopped
+    #logging:
+    #  driver: json-file
+    #  options:
+    #    max-file: ${DOCKERLOGGING_MAXFILE}
+    #    max-size: ${DOCKERLOGGING_MAXSIZE}
+    user: 1000:1000
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - /srv/appdata/autobrr:/config
+    # ports:
+    #   - 7474:7474
+    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
+    depends_on:
+      - transmission-openvpn # Set dependency on transmission-openvpn Container
   transmission-openvpn:
     cap_add:
       - NET_ADMIN
@@ -125,6 +144,7 @@ services:
       - 5055:5055 # Seer
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
+      - 7474:7474 # Autobrr
     image: haugene/transmission-openvpn
     env_file:
       - .env

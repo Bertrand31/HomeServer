@@ -12,8 +12,8 @@ services:
       - PEERPORT=1234
       # - HOST_WHITELIST= #optional
     volumes:
+      - /home/bertrand/data/torrents:/data
       - /srv/appdata/transmission:/config
-      - /home/bertrand/downloads:/downloads
       # - /home/bertrand/torrents:/watch
     ports:
       - 9091:9091

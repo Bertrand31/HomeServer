@@ -6,13 +6,13 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - USER=bertrand
-      - PASS=foobar
-      - WHITELIST= #optional
+      # - USER=bertrand
+      # - PASS=foobar
+      # - WHITELIST= #optional
       - PEERPORT=1234
-      - HOST_WHITELIST= #optional
+      # - HOST_WHITELIST= #optional
     volumes:
-      - /home/bertrand/transmission-data:/config
+      - /srv/appdata/transmission:/config
       - /home/bertrand/downloads:/downloads
       # - /home/bertrand/torrents:/watch
     ports:

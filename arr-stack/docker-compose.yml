@@ -9,8 +9,8 @@ services:
       - 8096:8096/tcp
       - 7359:7359/udp
     volumes:
-      - /home/bertrand/jellyfin/config:/config
-      - /home/bertrand/jellyfin/cache:/cache
+      - /srv/appdata/jellyfin/config:/config
+      - /srv/appdata/jellyfin/cache:/cache
       - type: bind
         source: /home/bertrand/data/media
         target: /media
@@ -28,7 +28,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/bertrand/prowlarr:/config
+      - /srv/appdata/prowlarr:/config
     # ports:
     #   - 9696:9696
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
     # ports:
     #   - 5055:5055
     volumes:
-      - /home/bertrand/seer/config:/app/config
+      - /srv/appdata/seer/config:/app/config
     network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
     depends_on:
       - transmission-openvpn # Set dependency on transmission-openvpn Container
@@ -70,9 +70,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/bertrand/radarr/config:/config
+      - /srv/appdata/radarr/config:/config
       - /home/bertrand/data/media/movies:/movies #optional
-      # - /home/bertrand/data:/data #optional
       - /home/bertrand/data/torrents/completed/radarr:/data/completed/radarr
     # ports:
     #   - 7878:7878
@@ -88,9 +87,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/bertrand/sonarr/config:/config
+      - /srv/appdata/sonarr/config:/config
       - /home/bertrand/data/media/tv:/tv #optional
-      # - /home/bertrand/downloads:/downloads #optional
+      # - /srv/appdata/downloads:/downloads #optional
       - /home/bertrand/data/torrents/completed/sonarr:/data/completed/sonarr
     # ports:
     #   - 8989:8989
@@ -103,7 +102,7 @@ services:
       - NET_ADMIN
     volumes:
       - /home/bertrand/data/torrents:/data
-      - /home/bertrand/transmission-openvpn:/config
+      - /srv/appdata/transmission-openvpn:/config
     environment:
       - OPENVPN_PROVIDER=NORDVPN
       - OPENVPN_USERNAME=${NORDVPN_USERNAME}

@@ -13,8 +13,8 @@ services:
       # - HOST_WHITELIST= #optional
     volumes:
       - /home/bertrand/data/torrents:/data
+      - /home/bertrand/data/media:/media
       - /srv/appdata/transmission:/config
-      # - /home/bertrand/torrents:/watch
     ports:
       - 9091:9091
       - 1234:1234

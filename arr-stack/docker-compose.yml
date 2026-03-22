@@ -117,6 +117,8 @@ services:
     depends_on:
       - transmission-openvpn # Set dependency on transmission-openvpn Container
   transmission-openvpn:
+    container_name: transmission-openvpn
+    image: haugene/transmission-openvpn
     cap_add:
       - NET_ADMIN
     volumes:
@@ -145,6 +147,5 @@ services:
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
       - 7474:7474 # Autobrr
-    image: haugene/transmission-openvpn
     env_file:
       - .env

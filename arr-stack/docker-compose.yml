@@ -5,9 +5,6 @@ services:
     user: 1000:988
     group_add:
       - '992' # Result of: getent group render | cut -d: -f3
-    ports:
-      - 8096:8096/tcp
-      - 7359:7359/udp
     volumes:
       - /srv/appdata/jellyfin/config:/config
       - /srv/appdata/jellyfin/cache:/cache
@@ -16,10 +13,11 @@ services:
         target: /media
     restart: 'unless-stopped'
     # Optional - may be necessary for docker healthcheck to pass if running in host network mode
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    # extra_hosts:
+    #   - 'host.docker.internal:host-gateway'
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
+    network_mode: "service:gluetun"
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -29,17 +27,8 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /srv/appdata/prowlarr:/config
-    # ports:
-    #   - 9696:9696
     restart: unless-stopped
-    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
-    depends_on:
-      - transmission-openvpn # Set dependency on transmission-openvpn Container
-    healthcheck: # Here we check if transmission is reachable from the Prowlarr container via localhost
-      test: curl -f http://localhost:9091 || exit 1
-      interval: 5m00s
-      timeout: 10s
-      retries: 2
+    network_mode: "service:gluetun"
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
@@ -48,13 +37,9 @@ services:
       - LOG_LEVEL=debug
       - TZ=Etc/UTC
       - PORT=5055 #optional
-    # ports:
-    #   - 5055:5055
     volumes:
       - /srv/appdata/seer/config:/app/config
-    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
-    depends_on:
-      - transmission-openvpn # Set dependency on transmission-openvpn Container
+    network_mode: "service:gluetun"
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -73,12 +58,8 @@ services:
       - /srv/appdata/radarr/config:/config
       - /home/bertrand/data/media/movies:/movies #optional
       - /home/bertrand/data/torrents/completed/radarr:/data/completed/radarr
-    # ports:
-    #   - 7878:7878
     restart: unless-stopped
-    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
-    depends_on:
-      - transmission-openvpn # Set dependency on transmission-openvpn Container
+    network_mode: "service:gluetun"
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -91,61 +72,66 @@ services:
       - /home/bertrand/data/media/tv:/tv #optional
       # - /srv/appdata/downloads:/downloads #optional
       - /home/bertrand/data/torrents/completed/sonarr:/data/completed/sonarr
-    # ports:
-    #   - 8989:8989
     restart: unless-stopped
-    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
-    depends_on:
-      - transmission-openvpn # Set dependency on transmission-openvpn Container
+    network_mode: "service:gluetun"
   autobrr:
     container_name: autobrr
     image: ghcr.io/autobrr/autobrr:latest
     restart: unless-stopped
-    #logging:
-    #  driver: json-file
-    #  options:
-    #    max-file: ${DOCKERLOGGING_MAXFILE}
-    #    max-size: ${DOCKERLOGGING_MAXSIZE}
     user: 1000:1000
     environment:
       - TZ=Etc/UTC
     volumes:
       - /srv/appdata/autobrr:/config
-    # ports:
-    #   - 7474:7474
-    network_mode: "service:transmission-openvpn" # Add to the transmission-openvpn Container Network
-    depends_on:
-      - transmission-openvpn # Set dependency on transmission-openvpn Container
-  transmission-openvpn:
-    container_name: transmission-openvpn
-    image: haugene/transmission-openvpn
+    network_mode: "service:gluetun"
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=9092
+      - TORRENTING_PORT=6881
+    volumes:
+      - /srv/appdata/qbittorrent:/config
+      - /home/bertrand/data/torrents:/data
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    # line above must be uncommented to allow external containers to connect.
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
     cap_add:
       - NET_ADMIN
-    volumes:
-      - /home/bertrand/data/torrents:/data
-      - /srv/appdata/transmission-openvpn:/config
-    environment:
-      - OPENVPN_PROVIDER=NORDVPN
-      - OPENVPN_USERNAME=${NORDVPN_USERNAME}
-      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
-      - NORDVPN_COUNTRY=NL
-      - NORDVPN_CATEGORY=p2p
-      - NORDVPN_PROTOCOL=tcp
-      - LOCAL_NETWORK=192.168.0.0/16
-      # Fix random crashes
-      # https://github.com/haugene/docker-transmission-openvpn/discussions/2064#discussioncomment-3021938
-      - CONFIG_MOD_PING=0
-      - OPENVPN_OPTS=--ping 10 --pull-filter ignore ping
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
+    devices:
+      - /dev/net/tun:/dev/net/tun
     ports:
-      - 9092:9091
-      - 9696:9696 # Prowlarr port
+      # - 8888:8888/tcp # HTTP proxy
+      # - 8388:8388/tcp # Shadowsocks
+      # - 8388:8388/udp # Shadowsocks
+      - 9696:9696 # Prowlarr
       - 5055:5055 # Seer
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
       - 7474:7474 # Autobrr
+      - 9092:9092 # QBittorrent
+      # - 6881:6881 # QBittorrent - active mode
+      # - 6881:6881/udp # QBittorrent - active mode
+      - 8096:8096/tcp # Jellyfin
+      - 7359:7359/udp # Jellyfin
+    # volumes:
+      # - /yourpath:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${NORDVPN_USERNAME}
+      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
+      - SERVER_COUNTRIES=Netherlands
+      - SERVER_CATEGORIES=P2P
+      - TZ=Etc/UTC
+      - UPDATER_PERIOD=24h
     env_file:
       - .env

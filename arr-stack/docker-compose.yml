@@ -133,5 +133,8 @@ services:
       - SERVER_CATEGORIES=P2P
       - TZ=Etc/UTC
       - UPDATER_PERIOD=24h
+      - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
+      - BLOCK_SURVEILLANCE=on
+      - BLOCK_ADS=on
     env_file:
       - .env

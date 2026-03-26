@@ -57,7 +57,7 @@ services:
     volumes:
       - /srv/appdata/radarr/config:/config
       - /home/bertrand/data/media/movies:/movies #optional
-      - /home/bertrand/data/torrents/completed/radarr:/data/completed/radarr
+      - /home/bertrand/data/torrents/completed:/data/completed
     restart: unless-stopped
     network_mode: "service:gluetun"
   sonarr:
@@ -76,7 +76,7 @@ services:
     network_mode: "service:gluetun"
   autobrr:
     container_name: autobrr
-    image: ghcr.io/autobrr/autobrr:latest
+    image: ghcr.io/autobrr/autobrr:v1.74.0 # TEMPORARY, until transmission fix
     restart: unless-stopped
     user: 1000:1000
     environment:
@@ -138,3 +138,24 @@ services:
       - BLOCK_ADS=on
     env_file:
       - .env
+  transmission: # NOT BEHIND GLUETUN
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # - USER=bertrand
+      # - PASS=foobar
+      # - WHITELIST= #optional
+      - PEERPORT=1234
+      # - HOST_WHITELIST= #optional
+    volumes:
+      - /home/bertrand/data/torrents:/data
+      - /home/bertrand/data/media:/media
+      - /srv/appdata/transmission:/config
+    ports:
+      - 9091:9091
+      - 1234:1234
+      - 1234:1234/udp
+    restart: unless-stopped

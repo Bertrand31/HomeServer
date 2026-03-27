@@ -11,6 +11,7 @@ services:
     volumes:
       - config:/opt/adguardhome/conf # app configuration
       - work:/opt/adguardhome/work # app working directory
+    restart: unless-stopped
     healthcheck:
       test: "/bin/netstat -pant | /bin/grep ':::53' || exit 1"
       interval: 45s

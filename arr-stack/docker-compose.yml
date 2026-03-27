@@ -98,6 +98,19 @@ services:
       - /home/bertrand/data/torrents:/data
     restart: unless-stopped
     network_mode: "service:gluetun"
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_FILE=none
+      - LOG_HTML=false
+      # - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=Europe/Paris
+    volumes:
+      - /srv/appdata/flaresolverr:/config
+    restart: unless-stopped
+    network_mode: "service:gluetun"
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -121,6 +134,7 @@ services:
       # - 6881:6881/udp # QBittorrent - active mode
       - 8096:8096/tcp # Jellyfin
       - 7359:7359/udp # Jellyfin
+      - 8191:8191 # Flaresolverr
     # volumes:
       # - /yourpath:/gluetun
     environment:

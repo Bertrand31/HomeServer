@@ -56,8 +56,7 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /srv/appdata/radarr/config:/config
-      - /home/bertrand/data/media/movies:/movies #optional
-      - /home/bertrand/data/torrents/completed:/data/completed
+      - /home/bertrand/data:/data
     restart: unless-stopped
     network_mode: "service:gluetun"
   sonarr:
@@ -69,9 +68,7 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /srv/appdata/sonarr/config:/config
-      - /home/bertrand/data/media/tv:/tv #optional
-      # - /srv/appdata/downloads:/downloads #optional
-      - /home/bertrand/data/torrents/completed/sonarr:/data/completed/sonarr
+      - /home/bertrand/data:/data
     restart: unless-stopped
     network_mode: "service:gluetun"
   autobrr:
@@ -95,7 +92,7 @@ services:
       - TORRENTING_PORT=6881
     volumes:
       - /srv/appdata/qbittorrent:/config
-      - /home/bertrand/data/torrents:/data
+      - /home/bertrand/data:/data
     restart: unless-stopped
     network_mode: "service:gluetun"
   flaresolverr:

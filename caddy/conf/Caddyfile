@@ -1,7 +1,7 @@
 :80 {
-  handle_path /adguard/* {
-    reverse_proxy host.docker.internal:8080
-  }
+  # handle_path /adguard/* {
+  #  reverse_proxy host.docker.internal:8080
+  # }
 
   handle {
     root /srv

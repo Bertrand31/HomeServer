@@ -5,10 +5,10 @@
 		<title>Casper</title>
 
 		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+		<meta name="apple-mobile-web-app-title" content="Casper" />
 		<link rel="manifest" href="/site.webmanifest" />
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,86 +17,103 @@
 	</head>
 
 	<body>
-
 		<div class="dashboard">
-
 			<div class="clock">
 				<div id="time"></div>
 				<div class="date" id="date"></div>
 			</div>
-
 			<div class="grid">
-
-				<a class="tile" href="http://192.168.0.45/jellyfin/" target="_blank">
+				<a class="tile" href="http://192.168.0.45:8096/" target="_blank">
 					<div class="icon">
 						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jellyfin.png">
 					</div>
 					<div class="label">Jellyfin</div>
 				</a>
-
+				<a class="tile" href="http://192.168.0.45:5055" target="_blank">
+					<div class="icon">
+						<img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/jellyseerr.webp">
+					</div>
+					<div class="label">Seer</div>
+				</a>
 				<a class="tile" href="http://192.168.0.45:2283" target="_blank">
 					<div class="icon">
 						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/immich.png">
 					</div>
 					<div class="label">Immich</div>
 				</a>
-
-				<a class="tile" href="http://192.168.0.45/transmission-vpn/transmission/web/" target="_blank">
-					<div class="icon">
-						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/transmission.png">
-					</div>
-					<div class="label">Transmission</div>
-				</a>
-
-				<a class="tile" href="https://192.168.0.45:943" target="_blank">
-					<div class="icon">
-						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/openvpn.png">
-					</div>
-					<div class="label">OpenVPN</div>
-				</a>
-
 				<a class="tile" href="http://192.168.0.45/adguard/" target="_blank">
 					<div class="icon">
 						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/adguard-home.png">
 					</div>
 					<div class="label">AdGuard</div>
 				</a>
-
+				<a class="tile" href="http://192.168.0.45:9092/" target="_blank">
+					<div class="icon">
+						<img src="./qbittorrent.svg">
+					</div>
+					<div class="label">qBittorrent</div>
+				</a>
+				<a class="tile" href="http://192.168.0.45:9091" target="_blank">
+					<div class="icon">
+						<img src="/transmission-novpn.png">
+					</div>
+					<div class="label">Transmission</div>
+				</a>
+				<a class="tile" href="https://192.168.0.45:943/admin/" target="_blank">
+					<div class="icon">
+						<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/openvpn.png">
+					</div>
+					<div class="label">OpenVPN</div>
+				</a>
 				<a class="tile" href="http://192.168.0.45:8090" target="_blank">
 					<div class="icon">
 						<img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/beszel-light.svg">
 					</div>
 					<div class="label">Beszel</div>
 				</a>
-
+				<a class="tile" href="http://192.168.0.45:7878" target="_blank">
+					<div class="icon">
+						<img src="https://cdn.rawgit.com/Radarr/Radarr/develop/Logo/256.png">
+					</div>
+					<div class="label">Radarr</div>
+				</a>
+				<a class="tile" href="http://192.168.0.45:8989" target="_blank">
+					<div class="icon">
+						<img src="https://res.cloudinary.com/razordarkamg/image/upload/v1621212884/SonarrV3_pufacd.png">
+					</div>
+					<div class="label">Sonarr</div>
+				</a>
+				<a class="tile" href="http://192.168.0.45:9696" target="_blank">
+					<div class="icon">
+						<img src="/prowlarr.png">
+					</div>
+					<div class="label">Prowlarr</div>
+				</a>
+				<a class="tile" href="http://192.168.0.45:7474" target="_blank">
+					<div class="icon">
+						<img src="/autobrr.png">
+					</div>
+					<div class="label">Autobrr</div>
+				</a>
 			</div>
 		</div>
 		<script>
-
 			function updateClock(){
-
 				const now = new Date()
-
 				const time = now.toLocaleTimeString([],{
 					hour:'2-digit',
 					minute:'2-digit'
 				})
-
 				const date = now.toLocaleDateString(undefined,{
 					weekday:'long',
 					month:'long',
 					day:'numeric'
 				})
-
 				document.getElementById("time").textContent=time
 				document.getElementById("date").textContent=date
-
 			}
-
 			setInterval(updateClock,5000)
 			updateClock()
-
 		</script>
-
 	</body>
 </html>

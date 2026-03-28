@@ -1,0 +1,172 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    user: 1000:988
+    group_add:
+      - '992' # Result of: getent group render | cut -d: -f3
+    volumes:
+      - /srv/appdata/jellyfin/config:/config
+      - /srv/appdata/jellyfin/cache:/cache
+      - type: bind
+        source: /home/bertrand/data/media
+        target: /media
+    restart: 'unless-stopped'
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    # extra_hosts:
+    #   - 'host.docker.internal:host-gateway'
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    network_mode: "service:gluetun"
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /srv/appdata/prowlarr:/config
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Etc/UTC
+      - PORT=5055 #optional
+    volumes:
+      - /srv/appdata/seer/config:/app/config
+    network_mode: "service:gluetun"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /srv/appdata/radarr/config:/config
+      - /home/bertrand/data:/data
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /srv/appdata/sonarr/config:/config
+      - /home/bertrand/data:/data
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:v1.74.0 # TEMPORARY, until transmission fix
+    restart: unless-stopped
+    user: 1000:1000
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - /srv/appdata/autobrr:/config
+    network_mode: "service:gluetun"
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=9092
+      - TORRENTING_PORT=6881
+    volumes:
+      - /srv/appdata/qbittorrent:/config
+      - /home/bertrand/data:/data
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_FILE=none
+      - LOG_HTML=false
+      # - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=Europe/Paris
+    volumes:
+      - /srv/appdata/flaresolverr:/config
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    # line above must be uncommented to allow external containers to connect.
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      # - 8888:8888/tcp # HTTP proxy
+      # - 8388:8388/tcp # Shadowsocks
+      # - 8388:8388/udp # Shadowsocks
+      - 9696:9696 # Prowlarr
+      - 5055:5055 # Seer
+      - 7878:7878 # Radarr
+      - 8989:8989 # Sonarr
+      - 7474:7474 # Autobrr
+      - 9092:9092 # QBittorrent
+      # - 6881:6881 # QBittorrent - active mode
+      # - 6881:6881/udp # QBittorrent - active mode
+      - 8096:8096/tcp # Jellyfin
+      - 7359:7359/udp # Jellyfin
+      - 8191:8191 # Flaresolverr
+    # volumes:
+      # - /yourpath:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${NORDVPN_USERNAME}
+      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
+      - SERVER_COUNTRIES=Netherlands
+      - SERVER_CATEGORIES=P2P
+      - TZ=Etc/UTC
+      - UPDATER_PERIOD=24h
+      - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
+      - BLOCK_SURVEILLANCE=on
+      - BLOCK_ADS=on
+    env_file:
+      - .env
+  transmission: # NOT BEHIND GLUETUN
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # - USER=bertrand
+      # - PASS=foobar
+      # - WHITELIST= #optional
+      - PEERPORT=1234
+      # - HOST_WHITELIST= #optional
+    volumes:
+      - /home/bertrand/data/torrents:/data
+      - /home/bertrand/data/media:/media
+      - /srv/appdata/transmission:/config
+    ports:
+      - 9091:9091
+      - 1234:1234
+      - 1234:1234/udp
+    restart: unless-stopped

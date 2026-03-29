@@ -121,8 +121,6 @@ services:
       - 8096:8096/tcp # Jellyfin
       - 7359:7359/udp # Jellyfin
       - 8191:8191 # Flaresolverr
-    # volumes:
-      # - /yourpath:/gluetun
     environment:
       - VPN_SERVICE_PROVIDER=nordvpn
       - VPN_TYPE=openvpn
@@ -145,8 +143,7 @@ services:
       - TZ=Europe/Paris
       - PEERPORT=1234
     volumes:
-      - /home/bertrand/data/torrents:/data
-      - /home/bertrand/data/media:/media # FIXME: merge these two lines
+      - /home/bertrand/data:/data
       - /srv/appdata/transmission:/config
     ports:
       - 9091:9091

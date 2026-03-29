@@ -12,19 +12,15 @@ services:
         source: /home/bertrand/data/media
         target: /media
     restart: 'unless-stopped'
-    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
-    # extra_hosts:
-    #   - 'host.docker.internal:host-gateway'
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     network_mode: "service:gluetun"
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    user: 1000:1000
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
     volumes:
       - /srv/appdata/prowlarr:/config
     restart: unless-stopped
@@ -35,7 +31,7 @@ services:
     container_name: seerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
       - PORT=5055 #optional
     volumes:
       - /srv/appdata/seer/config:/app/config
@@ -50,10 +46,9 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    user: 1000:1000
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
     volumes:
       - /srv/appdata/radarr/config:/config
       - /home/bertrand/data:/data
@@ -62,10 +57,9 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    user: 1000:1000
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
     volumes:
       - /srv/appdata/sonarr/config:/config
       - /home/bertrand/data:/data
@@ -77,17 +71,16 @@ services:
     restart: unless-stopped
     user: 1000:1000
     environment:
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
     volumes:
       - /srv/appdata/autobrr:/config
     network_mode: "service:gluetun"
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    user: 1000:1000
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
       - WEBUI_PORT=9092
       - TORRENTING_PORT=6881
     volumes:
@@ -111,8 +104,6 @@ services:
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
-    # line above must be uncommented to allow external containers to connect.
-    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
     cap_add:
       - NET_ADMIN
     devices:
@@ -127,22 +118,19 @@ services:
       - 8989:8989 # Sonarr
       - 7474:7474 # Autobrr
       - 9092:9092 # QBittorrent
-      # - 6881:6881 # QBittorrent - active mode
-      # - 6881:6881/udp # QBittorrent - active mode
       - 8096:8096/tcp # Jellyfin
       - 7359:7359/udp # Jellyfin
       - 8191:8191 # Flaresolverr
     # volumes:
       # - /yourpath:/gluetun
     environment:
-      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
       - VPN_SERVICE_PROVIDER=nordvpn
       - VPN_TYPE=openvpn
       - OPENVPN_USER=${NORDVPN_USERNAME}
       - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
       - SERVER_COUNTRIES=Netherlands
       - SERVER_CATEGORIES=P2P
-      - TZ=Etc/UTC
+      - TZ=Europe/Paris
       - UPDATER_PERIOD=24h
       - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
       - BLOCK_SURVEILLANCE=on
@@ -152,18 +140,13 @@ services:
   transmission: # NOT BEHIND GLUETUN
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
+    user: 1000:1000
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      # - USER=bertrand
-      # - PASS=foobar
-      # - WHITELIST= #optional
+      - TZ=Europe/Paris
       - PEERPORT=1234
-      # - HOST_WHITELIST= #optional
     volumes:
       - /home/bertrand/data/torrents:/data
-      - /home/bertrand/data/media:/media
+      - /home/bertrand/data/media:/media # FIXME: merge these two lines
       - /srv/appdata/transmission:/config
     ports:
       - 9091:9091

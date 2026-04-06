@@ -11,9 +11,9 @@ services:
       - type: bind
         source: /home/bertrand/data/media
         target: /media
-    restart: 'unless-stopped'
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
+    restart: 'unless-stopped'
     network_mode: "service:gluetun"
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -35,7 +35,6 @@ services:
       - PORT=5055 #optional
     volumes:
       - /srv/appdata/seer/config:/app/config
-    network_mode: "service:gluetun"
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -43,6 +42,7 @@ services:
       interval: 15s
       retries: 3
     restart: unless-stopped
+    network_mode: "service:gluetun"
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
@@ -65,15 +65,17 @@ services:
       - /home/bertrand/data:/data
     restart: unless-stopped
     network_mode: "service:gluetun"
-  autobrr:
-    container_name: autobrr
-    image: ghcr.io/autobrr/autobrr:v1.74.0 # TEMPORARY, until transmission fix
-    restart: unless-stopped
+  sportarr:
+    image: sportarr/sportarr:latest
+    container_name: sportarr
     user: 1000:1000
     environment:
+      - UMASK=022
       - TZ=Europe/Paris
     volumes:
-      - /srv/appdata/autobrr:/config
+      - /srv/appdata/sportarr:/config
+      - /home/bertrand/data:/data
+    restart: unless-stopped
     network_mode: "service:gluetun"
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -82,7 +84,7 @@ services:
     environment:
       - TZ=Europe/Paris
       - WEBUI_PORT=9092
-      - TORRENTING_PORT=6881
+      - TORRENTING_PORT=42991
     volumes:
       - /srv/appdata/qbittorrent:/config
       - /home/bertrand/data:/data
@@ -116,37 +118,21 @@ services:
       - 5055:5055 # Seer
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
-      - 7474:7474 # Autobrr
-      - 9092:9092 # QBittorrent
+      - 1867:1867 # Sportarr
+      # - 7474:7474 # Autobrr
+      - 9092:9092 # qBittorrent
       - 8096:8096/tcp # Jellyfin
       - 7359:7359/udp # Jellyfin
-      - 8191:8191 # Flaresolverr
+      # - 8191:8191 # Flaresolverr
     environment:
-      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_SERVICE_PROVIDER=airvpn
       - VPN_TYPE=openvpn
-      - OPENVPN_USER=${NORDVPN_USERNAME}
-      - OPENVPN_PASSWORD=${NORDVPN_PASSWORD}
       - SERVER_COUNTRIES=Netherlands
-      - SERVER_CATEGORIES=P2P
+      - FIREWALL_VPN_INPUT_PORTS=42991
       - TZ=Europe/Paris
       - UPDATER_PERIOD=24h
       - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
       - BLOCK_SURVEILLANCE=on
       - BLOCK_ADS=on
-    env_file:
-      - .env
-  transmission: # NOT BEHIND GLUETUN
-    image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
-    user: 1000:1000
-    environment:
-      - TZ=Europe/Paris
-      - PEERPORT=1234
     volumes:
-      - /home/bertrand/data:/data
-      - /srv/appdata/transmission:/config
-    ports:
-      - 9091:9091
-      - 1234:1234
-      - 1234:1234/udp
-    restart: unless-stopped
+      - /srv/appdata/gluetun:/gluetun

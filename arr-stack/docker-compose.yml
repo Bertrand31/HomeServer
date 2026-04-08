@@ -84,10 +84,12 @@ services:
     environment:
       - TZ=Europe/Paris
       - WEBUI_PORT=9092
-      - TORRENTING_PORT=42991
+      - TORRENTING_PORT=${FORWARDED_PORT}
     volumes:
       - /srv/appdata/qbittorrent:/config
       - /home/bertrand/data:/data
+    env_file:
+      - .env
     restart: unless-stopped
     network_mode: "service:gluetun"
   flaresolverr:
@@ -128,7 +130,7 @@ services:
       - VPN_SERVICE_PROVIDER=airvpn
       - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=Netherlands
-      - FIREWALL_VPN_INPUT_PORTS=42991
+      - FIREWALL_VPN_INPUT_PORTS=${FORWARDED_PORT}
       - TZ=Europe/Paris
       - UPDATER_PERIOD=24h
       - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
@@ -136,4 +138,6 @@ services:
       - BLOCK_ADS=on
     volumes:
       - /srv/appdata/gluetun:/gluetun
+    env_file:
+      - .env
     restart: unless-stopped

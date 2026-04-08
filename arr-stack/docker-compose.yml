@@ -136,3 +136,4 @@ services:
       - BLOCK_ADS=on
     volumes:
       - /srv/appdata/gluetun:/gluetun
+    restart: unless-stopped

@@ -29,6 +29,8 @@ services:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
     container_name: seerr
+    security_opt:
+      - no-new-privileges:true
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Paris
@@ -110,6 +112,8 @@ services:
     container_name: gluetun
     cap_add:
       - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:

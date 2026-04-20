@@ -148,7 +148,7 @@ services:
       - TZ=Europe/Paris
       - VPN_SERVICE_PROVIDER=airvpn
       - VPN_TYPE=openvpn
-      - SERVER_COUNTRIES=Netherlands
+      - SERVER_COUNTRIES=Netherlands,Switzerland
       - FIREWALL_VPN_INPUT_PORTS=${FORWARDED_PORT}
       - UPDATER_PERIOD=24h
       - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns

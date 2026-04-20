@@ -12,9 +12,17 @@ services:
       - /srv/appdata/beszel/beszel_socket:/beszel_socket
 
   beszel-agent:
-    image: henrygd/beszel-agent
+    image: henrygd/beszel-agent-intel
     container_name: beszel-agent
-    restart: unless-stopped
+    cap_add:
+      - CAP_PERFMON # For Intel GPU
+      - SYS_RAWIO # required for S.M.A.R.T. data
+      - SYS_ADMIN # required for NVMe S.M.A.R.T. data
+    devices:
+      - /dev/dri/card0:/dev/dri/card0 # Intel GPU
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/sda:/dev/sda
+      - /dev/nvme0:/dev/nvme0
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -23,6 +31,9 @@ services:
       - /home:/extra-filesystems/sda1__Media:ro
     environment:
       LISTEN: 45876
-      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDXFIRTsEE4pIfoPdt67HO+2qVhXvoiDtFi3Vc2j/GTF'
-      TOKEN: ab89-023cc9df08-fcc7-f53c566318
+      KEY: ${KEY}
+      TOKEN: ${TOKEN}
       HUB_URL: http://localhost:8090
+    env_file:
+      - .env
+    restart: unless-stopped

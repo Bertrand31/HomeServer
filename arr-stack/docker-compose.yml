@@ -97,6 +97,7 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
+    user: 1000:1000
     environment:
       - LOG_LEVEL=info
       - LOG_FILE=none
@@ -105,6 +106,20 @@ services:
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/flaresolverr:/config
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /srv/appdata/bazarr:/config
+      - /home/bertrand/data:/data
+      # - /path/to/movies:/movies #optional
+      # - /path/to/tv:/tv #optional
     restart: unless-stopped
     network_mode: "service:gluetun"
   gluetun:
@@ -125,17 +140,16 @@ services:
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
       - 1867:1867 # Sportarr
-      # - 7474:7474 # Autobrr
       - 9092:9092 # qBittorrent
       - 8096:8096/tcp # Jellyfin
       - 7359:7359/udp # Jellyfin
-      # - 8191:8191 # Flaresolverr
+      - 6767:6767 # Bazarr
     environment:
+      - TZ=Europe/Paris
       - VPN_SERVICE_PROVIDER=airvpn
       - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=Netherlands
       - FIREWALL_VPN_INPUT_PORTS=${FORWARDED_PORT}
-      - TZ=Europe/Paris
       - UPDATER_PERIOD=24h
       - DNS_UPSTREAM_RESOLVERS=quad9 secured,libredns
       - BLOCK_SURVEILLANCE=on

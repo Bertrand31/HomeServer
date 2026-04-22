@@ -20,8 +20,9 @@ services:
       - SYS_ADMIN # required for NVMe S.M.A.R.T. data
     devices:
       - /dev/dri/card0:/dev/dri/card0 # Intel GPU
-      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/renderD128:/dev/dri/renderD128 # Intel GPU
       - /dev/sda:/dev/sda
+      - /dev/sdb:/dev/sdb
       - /dev/nvme0:/dev/nvme0
     network_mode: host
     volumes:
@@ -29,6 +30,7 @@ services:
       - /srv/appdata/beszel/beszel_agent_data:/var/lib/beszel-agent
       # monitor other disks / partitions by mounting a folder in /extra-filesystems
       - /home:/extra-filesystems/sda1__Media:ro
+      - /home:/extra-filesystems/sdb1__Data:ro
     environment:
       LISTEN: 45876
       KEY: ${KEY}

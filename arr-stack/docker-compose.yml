@@ -9,7 +9,7 @@ services:
       - /srv/appdata/jellyfin/config:/config
       - /srv/appdata/jellyfin/cache:/cache
       - type: bind
-        source: /home/bertrand/data/media
+        source: /mnt/data/media
         target: /media
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
@@ -53,7 +53,8 @@ services:
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/radarr/config:/config
-      - /home/bertrand/data:/data
+      - /home/bertrand/data/torrents:/torrents
+      - /mnt/data/media:/media
     restart: unless-stopped
     network_mode: "service:gluetun"
   sonarr:
@@ -64,7 +65,8 @@ services:
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/sonarr/config:/config
-      - /home/bertrand/data:/data
+      - /home/bertrand/data/torrents:/torrents
+      - /mnt/data/media:/media
     restart: unless-stopped
     network_mode: "service:gluetun"
   sportarr:
@@ -76,7 +78,8 @@ services:
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/sportarr:/config
-      - /home/bertrand/data:/data
+      - /home/bertrand/data/torrents:/torrents
+      - /mnt/data/media:/media
     restart: unless-stopped
     network_mode: "service:gluetun"
   qbittorrent:
@@ -89,7 +92,7 @@ services:
       - TORRENTING_PORT=${FORWARDED_PORT}
     volumes:
       - /srv/appdata/qbittorrent:/config
-      - /home/bertrand/data:/data
+      - /home/bertrand/data:/data # TODO: change this to /torrents
     env_file:
       - .env
     restart: unless-stopped
@@ -117,9 +120,7 @@ services:
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/bazarr:/config
-      - /home/bertrand/data:/data
-      # - /path/to/movies:/movies #optional
-      # - /path/to/tv:/tv #optional
+      - /mnt/data/media:/media
     restart: unless-stopped
     network_mode: "service:gluetun"
   gluetun:

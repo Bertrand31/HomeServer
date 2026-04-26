@@ -92,7 +92,7 @@ services:
       - TORRENTING_PORT=${FORWARDED_PORT}
     volumes:
       - /srv/appdata/qbittorrent:/config
-      - /home/bertrand/data:/data # TODO: change this to /torrents
+      - /home/bertrand/data/torrents:/torrents
     env_file:
       - .env
     restart: unless-stopped

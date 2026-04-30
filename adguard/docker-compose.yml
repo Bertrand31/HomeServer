@@ -2,7 +2,7 @@ name: adguardhome
 
 services:
   adguardhome:
-    image: adguard/adguardhome
+    image: adguard/adguardhome:v0.107.74
     ports:
       - 53:53/tcp # plain dns over tcp
       - 53:53/udp # plain dns over udp

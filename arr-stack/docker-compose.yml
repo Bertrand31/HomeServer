@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: jellyfin/jellyfin
+    image: jellyfin/jellyfin:2026042706@sha256:5aa5c9b240eff60481e8ea1f9b3140649d01cd0295f9506b698adbc524279b80
     container_name: jellyfin
     user: 1000:988
     group_add:
@@ -83,7 +83,7 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:5.1.4@sha256:3679a75dd2304b695525d83a4ff14c458708b5da4a7ce53044240932139590e1
     container_name: qbittorrent
     user: 1000:1000
     environment:
@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
   gluetun:
-    image: qmcgaw/gluetun
+    image: qmcgaw/gluetun:v3.41.1@sha256:1a5bf4b4820a879cdf8d93d7ef0d2d963af56670c9ebff8981860b6804ebc8ab
     container_name: gluetun
     cap_add:
       - NET_ADMIN

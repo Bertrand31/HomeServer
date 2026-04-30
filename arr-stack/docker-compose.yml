@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: jellyfin/jellyfin:2026042706@sha256:5aa5c9b240eff60481e8ea1f9b3140649d01cd0295f9506b698adbc524279b80
+    image: jellyfin/jellyfin
     container_name: jellyfin
     user: 1000:988
     group_add:

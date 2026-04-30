@@ -16,10 +16,11 @@ services:
     restart: 'unless-stopped'
     network_mode: "service:gluetun"
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: lscr.io/linuxserver/prowlarr:2.3.5@sha256:b4204e18666179472225935b443a99cf6c66dcb7bbc2d35034427a3851f13135
     container_name: prowlarr
-    user: 1000:1000
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Paris
     volumes:
       - /srv/appdata/prowlarr:/config

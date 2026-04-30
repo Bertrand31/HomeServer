@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
   seerr:
-    image: ghcr.io/seerr-team/seerr:latest
+    image: ghcr.io/seerr-team/seerr:sha-b32ab02@sha256:4410e9a18f889aedfae82b45625ad1f77b8504a09ca74ef28a8ee64313f219cd
     init: true
     container_name: seerr
     security_opt:
